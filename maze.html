@@ -44,29 +44,64 @@ function BuildMaze(size){
         let square = document.createElement("div");  
         square.style.border = "1px solid black";     
         square.style.gridRow = `${i}/span 1`;
-        square.style.gridColumn = `${j}/span 1`;           
+        square.style.gridColumn = `${j}/span 1`;   
+        square.className = "node";        
         square.id = "node" + parseInt(((i-1)*size) + j); 
         document.querySelector("#maze").appendChild(square); 
 
         if(i == 1 || i == size || square.id.substring(4, square.id.length) % size == 1 || square.id.substring(4, square.id.length) % size == 0){
-            edgeNodes.push(square.id.substring(4, square.id.length));
+            edgeNodes.push(parseInt(square.id.substring(4, square.id.length)));
         } 
     }
   }  
 
+        document.querySelectorAll(".node").forEach(node => {
+			if(node.style.borderTop == "1px solid black" && node.style.borderRight == "1px solid black" && node.style.borderBottom == "1px solid black" && node.style.borderLeft == "1px solid black"){
+                let random = Math.ceil(Math.random()*4);
+                let nonedge = true;
+                for(i = 0; i < edgeNodes.length; i++){
+                    if(node.id.substring(4, node.id.length) == edgeNodes[i]){
+                        nonedge = false;
+                    }
+                }
+                if(nonedge == true){
+                switch(random){
+                    case 1:
+                       node.style.borderTop = "thick solid white";
+                       //if(document.querySelector("#node" + node - size)) document.querySelector("#node" + node - size).style.borderBottom = "thick solid white"; 
+                    break;
+
+                    case 2:
+                       node.style.borderRight = "thick solid white";
+
+                    break;
+
+                    case 3:
+                        node.style.borderBottom = "thick solid white";
+                    break;
+
+                    case 4:
+                        node.style.borderLeft = "thick solid white";
+                    break;
+                }
+                }
+            }
+		});
+
     startNode = edgeNodes[Math.floor(Math.random()*edgeNodes.length)];
     if(startNode <= size) document.querySelector("#node"+startNode).style.borderTop = "1px solid white";
-    if(startNode <= size*size && startNode > size*(size-1)) document.querySelector(`#node${startNode}`).style.borderBottom = "1px solid white";
-    if(startNode % size == 1 && startNode != 1 && startNode != (size*(size-1)+1)) document.querySelector(`#node${startNode}`).style.borderLeft = "1px solid white";
-    if(startNode % size == 0 && startNode != size && startNode != size*size) document.querySelector(`#node${startNode}`).style.borderRight = "1px solid white";
+    else if(startNode <= size*size && (startNode > size*(size-1))) document.querySelector(`#node${startNode}`).style.borderBottom = "1px solid white";
+    else if(startNode % size == 1 && startNode != 1 && startNode != (size*(size-1)+1)) document.querySelector(`#node${startNode}`).style.borderLeft = "1px solid white";
+    else if(startNode % size == 0 && startNode > size) document.querySelector(`#node${startNode}`).style.borderRight = "1px solid white";
    // document.querySelector(`#node${startNode}`).style.backgroundColor = "#ccffcd";
 
     endNode = edgeNodes[Math.floor(Math.random()*edgeNodes.length)];
     if(endNode <= size) document.querySelector(`#node${endNode}`).style.borderTop = "1px solid white";
-    if(endNode <= size*size && endNode > size*(size-1)) document.querySelector(`#node${endNode}`).style.borderBottom = "1px solid white";
-    if(endNode % size == 1 && endNode != 1 && endNode != (size*(size-1)+1)) document.querySelector(`#node${endNode}`).style.borderLeft = "1px solid white";
-    if(endNode % size == 0 && endNode != size && endNode != size*size) document.querySelector(`#node${endNode}`).style.borderRight = "1px solid white";
+    else if(endNode <= size*size && endNode > size*(size-1)) document.querySelector(`#node${endNode}`).style.borderBottom = "1px solid white";
+    else if(endNode % size == 1) document.querySelector(`#node${endNode}`).style.borderLeft = "1px solid white";
+    else if(endNode % size == 0) document.querySelector(`#node${endNode}`).style.borderRight = "1px solid white";
    // document.querySelector(`#node${endNode}`).style.backgroundColor = "#ffcccc";
+   
 
     console.log(startNode + " , " + endNode);
 
@@ -81,7 +116,6 @@ function FindPath(start, end, size){
     let goodDirection;
    
    while(current != end){
-
         goodDirection = false;
 
         while(goodDirection == false){
@@ -90,8 +124,8 @@ function FindPath(start, end, size){
                 else if(next > size*size) goodDirection = false;
                 else if(current % size == 1 && next % size == 0) goodDirection = false;
                 else if(current % size == 0 && next % size == 1) goodDirection = false;
-                else if(current <= size && next > (size * size-1)) goodDirection = false;
-                else if(current > (size * size-1) && next <= size) goodDirection = false;
+                else if(current <= size && next > (size * (size-1))) goodDirection = false;
+                else if(current > (size * (size-1)) && next <= size) goodDirection = false;
                 else goodDirection =  true; 
         }
 
