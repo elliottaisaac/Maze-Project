@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Maze</title>
+<style>
+#maze{
+    display: grid;
+    grid-gap: 0px;
+    margin:50px auto 100px auto;
+}
+</style>
+</head>
+
+<body>
+    <input id="sizeInput" type="text" placeholder="enter maze size" value="25" style="border: 2px solid black; font-weight: bold; font-family:monospace; font-size: 2em; width:50px;">
+    <button id="buildBtn">Build Maze</button>
+    <button id="reload" onclick="location.reload();">reset</button>
+    <div id="maze"></div>  
+    
+
+<script>
+document.querySelector("#buildBtn").addEventListener("click", () => {
+    document.querySelector("#buildBtn").disabled = true;
+
+    BuildMaze(document.querySelector("#sizeInput").value);
+});
+
+
+function BuildMaze(size){
+    const maze = document.querySelector("#maze");
+    let edgeNodes = [];
+    let startNode;
+    let endNode;
+
+    maze.style.width = 25 * size + "px";
+    maze.style.height = 25 * size + "px";
+
+  for(let i = 1; i <= size; i++){
+    maze.style.gridTemplateColumns += " 1fr";
+    maze.style.gridTemplateRows += " 1fr";
+    
+    for(let j = 1; j <= size; j++){
+        let square = document.createElement("div");  
+        square.style.border = "1px solid black";     
+        square.style.gridRow = `${i}/span 1`;
+        square.style.gridColumn = `${j}/span 1`;           
+        square.id = "node" + parseInt(((i-1)*size) + j); 
+        document.querySelector("#maze").appendChild(square); 
+
+        if(i == 1 || i == size || square.id.substring(4, square.id.length) % size == 1 || square.id.substring(4, square.id.length) % size == 0){
+            edgeNodes.push(square.id.substring(4, square.id.length));
+        } 
+    }
+  }  
+
+    startNode = edgeNodes[Math.floor(Math.random()*edgeNodes.length)];
+    if(startNode <= size) document.querySelector("#node"+startNode).style.borderTop = "1px solid white";
+    if(startNode <= size*size && startNode > size*(size-1)) document.querySelector(`#node${startNode}`).style.borderBottom = "1px solid white";
+    if(startNode % size == 1 && startNode != 1 && startNode != (size*(size-1)+1)) document.querySelector(`#node${startNode}`).style.borderLeft = "1px solid white";
+    if(startNode % size == 0 && startNode != size && startNode != size*size) document.querySelector(`#node${startNode}`).style.borderRight = "1px solid white";
+   // document.querySelector(`#node${startNode}`).style.backgroundColor = "#ccffcd";
+
+    endNode = edgeNodes[Math.floor(Math.random()*edgeNodes.length)];
+    if(endNode <= size) document.querySelector(`#node${endNode}`).style.borderTop = "1px solid white";
+    if(endNode <= size*size && endNode > size*(size-1)) document.querySelector(`#node${endNode}`).style.borderBottom = "1px solid white";
+    if(endNode % size == 1 && endNode != 1 && endNode != (size*(size-1)+1)) document.querySelector(`#node${endNode}`).style.borderLeft = "1px solid white";
+    if(endNode % size == 0 && endNode != size && endNode != size*size) document.querySelector(`#node${endNode}`).style.borderRight = "1px solid white";
+   // document.querySelector(`#node${endNode}`).style.backgroundColor = "#ffcccc";
+
+    console.log(startNode + " , " + endNode);
+
+    FindPath(startNode, endNode, size);
+}
+
+function FindPath(start, end, size){
+    let current = start;
+    let next;
+    let visited = [start];
+    let path = [start];
+    let goodDirection;
+   
+   while(current != end){
+
+        goodDirection = false;
+
+        while(goodDirection == false){
+            next = ChooseDirection(current, size);
+                if(next < 1) goodDirection = false;
+                else if(next > size*size) goodDirection = false;
+                else if(current % size == 1 && next % size == 0) goodDirection = false;
+                else if(current % size == 0 && next % size == 1) goodDirection = false;
+                else if(current <= size && next > (size * size-1)) goodDirection = false;
+                else if(current > (size * size-1) && next <= size) goodDirection = false;
+                else goodDirection =  true; 
+        }
+
+               switch(next){
+                    case current - size:
+                        document.querySelector(`#node${current}`).style.borderTop = "1px solid white";
+                        document.querySelector(`#node${next}`).style.borderBottom = "1px solid white";
+                    break;
+
+                    case current + 1:
+                        document.querySelector(`#node${current}`).style.borderRight = "1px solid white";
+                        document.querySelector(`#node${next}`).style.borderLeft = "1px solid white";
+                    break;
+
+                    case current + size:
+                        document.querySelector(`#node${current}`).style.borderBottom = "1px solid white";
+                        document.querySelector(`#node${next}`).style.borderTop = "1px solid white";
+                    break;
+
+                    case current - 1:
+                        document.querySelector(`#node${current}`).style.borderLeft = "1px solid white";
+                        document.querySelector(`#node${next}`).style.borderRight = "1px solid white";
+                    break;
+                }
+                    path.push(next);
+                    current = next;
+     }
+
+    console.log(path);
+}
+
+
+function ChooseDirection(currentNode, size){
+    let rand = Math.random();
+    let direction = Math.ceil(rand*4);
+    let nextNode;
+    switch(direction){
+        case 1:
+            nextNode = currentNode - size;
+        break;
+
+        case 2:
+            nextNode = currentNode + 1;
+        break;
+
+        case 3:
+            nextNode = currentNode + size;
+        break;
+
+        case 4:
+            nextNode = currentNode - 1;
+        break;
+    }
+    
+    return nextNode;
+}
+
+</script>
+
+</body>
+</html>
